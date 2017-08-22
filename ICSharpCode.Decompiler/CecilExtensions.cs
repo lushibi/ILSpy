@@ -53,8 +53,10 @@ namespace ICSharpCode.Decompiler
 						break;
 
 					IMethodSignature method = (IMethodSignature) instruction.Operand;
-					return IsVoid (method.ReturnType) ? 0 : 1;
-			}
+                    if (method != null)
+                        return IsVoid(method.ReturnType) ? 0 : 1;
+                    return 0;
+            }
 
 			throw new NotSupportedException ();
 		}
@@ -99,10 +101,14 @@ namespace ICSharpCode.Decompiler
 						break;
 
 					IMethodSignature method = (IMethodSignature) instruction.Operand;
-					int count = method.HasParameters ? method.Parameters.Count : 0;
-					if (method.HasThis && code != OpCodes.Newobj)
-						++count;
-					if (code == OpCodes.Calli)
+                    int count = 0;
+                    if(method != null)
+                    { 
+					    count += method.HasParameters ? method.Parameters.Count : 0;
+					    if (method.HasThis && code != OpCodes.Newobj)
+						    ++count;
+                    }
+                    if (code == OpCodes.Calli)
 						++count; // calli takes a function pointer in additional to the normal args
 
 					return count;
